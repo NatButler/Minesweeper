@@ -58,7 +58,7 @@ function gameFinished() {
 function reset() {
 	stopTimer();
 	resetTimer();
-	face.innerHTML = '';
+	// face.innerHTML = '';
 
 	forEach(levelSelect, function(select) {
 		if (select.checked) {
