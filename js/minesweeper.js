@@ -185,9 +185,7 @@ function reset() {
 	bestTime.innerHTML = "";
 
 	forEach(levelSelect, function(select) {
-		if (select.checked) {
-			mode = select.getAttribute('data-mode');
-		}
+		if (select.checked) { mode = select.getAttribute('data-mode'); }
 	});
 
 	init();
@@ -206,7 +204,7 @@ function Minesweeper(mode) {
 				val = new Cell("blank");
 
 			grid.setValueAt( new Point(x, y), val );
-			tableHtml.push('<td id="'+cellId+'" class="blank"></td>')
+			tableHtml.push('<td id="'+cellId+'" class="blank"></td>');
 		}
 
 		tableHtml.push('</tr>');
@@ -218,14 +216,11 @@ function Minesweeper(mode) {
 }
 
 function setMines(point) {
-	var mines = createRandomPoints(modes.lookup(mode), point),
-		len = mines.length;
+	mineArr = createRandomPoints(modes.lookup(mode), point);
 
-	forEach(mines, function(mine) {
+	forEach(mineArr, function(mine) {
 		grid.setValueAt( mine, new Cell("mine") );
 	});
-
-	mineArr = mines;
 }
 
 function createRandomPoints(mode, point) {
@@ -319,7 +314,7 @@ function checkForUnflaggedMines() {
 }
 
 function revealMines(clickedCell) {
-	var arr = mineArr;
+	var viewArr = mineArr;
 
 	forEach(mineArr, function(mine) {
 		if (grid.valueAt(mine).Status !== "flagged") { grid.setStatusAt(mine, "revealed"); }
@@ -328,12 +323,12 @@ function revealMines(clickedCell) {
 	grid.each(function(point, value) {
 		if (value.Value !== 'mine' && value.Status === 'flagged') {
 			grid.setStatusAt(point, 'mis-flagged');
-			arr.push(point);
+			viewArr.push(point);
 		}
 	});
 
 	grid.setStatusAt(clickedCell, "exploaded");
-	return arr;
+	return viewArr;
 }
 
 function updateView(arr) {
@@ -361,17 +356,16 @@ function handleCellClick() {
 			if (!flags) { 
 				if (!checkForUnflaggedMines()) { gameFinished(); }
 			}
-
-		} else if (cellValue.Status === "flagged") {
+		} 
+		else if (cellValue.Status === "flagged") {
 			grid.setStatusAt(clickedCell);
 			flags++;
 		}
 
 		flagSpan.innerHTML = flags;
-
-	} else { 										// Handle normal click
+	} 
+	else { 											// Handle normal click
 		if (!started) { startGame(clickedCell); }									
-		
 		if (!cellValue.Status) {
 			if (cellValue.Value === "mine") { 		// Mine detonated - reveal all mines and incorrect flags: game over
 				viewArr = revealMines(clickedCell);
