@@ -6,7 +6,7 @@ var minesweeper, started, mineArr, flags, table, flagSpan, face, newGameButton, 
 window.onload = function() {
 	table = document.getElementById('table-grid');
 	flagSpan = document.getElementById('flag-count');
-	// face = document.getElementById('face');
+	face = document.getElementById('face');
 	newGameButton = document.getElementById('new-game');
 	bestTime = document.getElementById('best-time');
 	levelSelect = document.body.getElementsByTagName('input');
@@ -37,13 +37,13 @@ function startGame(point) {
 function gameOver() {
 	stopTimer();
 	unregisterEventHandlers(tds, "click", handleCellClick);
-	// face.innerHTML = '<img src="img/fail-face.png" alt="fail-face" />';
+	face.innerHTML = '<img src="img/fail-face.png" alt="fail-face" />';
 }
 
 function gameFinished() {
 	stopTimer();
 	unregisterEventHandlers(tds, "click", handleCellClick);
-	// face.innerHTML = '<img src="img/cool-face.png" alt="cool-face" />';
+	face.innerHTML = '<img src="img/cool-face.png" alt="cool-face" />';
 
 	// Save time to local storage; display best time
 	if (storage.check(mode)) {
@@ -58,7 +58,7 @@ function gameFinished() {
 function reset() {
 	stopTimer();
 	resetTimer();
-	// face.innerHTML = '';
+	face.innerHTML = '';
 
 	forEach(levelSelect, function(select) {
 		if (select.checked) {
@@ -340,10 +340,6 @@ function handleCellClick() {
 		cellValue = grid.valueAt(point),
 		viewArr = [point];
 
-	if (!started && !event.altKey) {
-		startGame(point);
-	}
-
 	if (event.altKey) { 							// Handle flags
 		if (!cellValue.Status && flags > 0) {
 			grid.setStatusAt(point, "flagged");
@@ -370,7 +366,11 @@ function handleCellClick() {
 
 		flagSpan.innerHTML = flags;
 
-	} else { 										// Handle normal click
+	} else { 					// Handle normal click
+		if (!started) {
+			startGame(point);
+		}									
+		
 		if (!cellValue.Status) {
 			if (cellValue.Value === "mine") { // Mine detonated - reveal all mines and incorrect flags: game over
 				viewArr = mineArr;
