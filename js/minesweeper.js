@@ -375,8 +375,6 @@ function handleCellClick() {
 			if (cellValue.Value === "mine") { // Mine detonated - reveal all mines and incorrect flags: game over
 				viewArr = mineArr;
 
-				grid.setStatusAt(point, "exploaded");
-
 				forEach(mineArr, function(mine) {
 					if (grid.valueAt(mine).Status !== "flagged") {
 						grid.setStatusAt(mine, "revealed");
@@ -389,6 +387,8 @@ function handleCellClick() {
 						viewArr.push(point);
 					}
 				});
+
+				grid.setStatusAt(point, "exploaded");
 
 				gameOver();
 
