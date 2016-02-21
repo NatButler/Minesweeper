@@ -1,6 +1,6 @@
 (function() {
 
-var grid, started, mineArr, flags, table, flagSpan, face, newGameButton, levelSelect, tds,
+var minesweeper, grid, started, mineArr, flags, table, flagSpan, face, newGameButton, levelSelect, tds,
 	mode = "Intermediate";
 
 window.onload = function() {
@@ -17,7 +17,7 @@ window.onload = function() {
 
 function init() {
 	started = false;
-	var minesweeper = new Minesweeper(modes.lookup(mode));
+	minesweeper = new Minesweeper(modes.lookup(mode));
 
 	flags = modes.lookup(mode)['mines'];
 	flagSpan.innerHTML = flags;
