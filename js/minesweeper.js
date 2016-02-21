@@ -6,7 +6,7 @@ var minesweeper, started, mineArr, flags, table, flagSpan, face, newGameButton, 
 window.onload = function() {
 	table = document.getElementById('table-grid');
 	flagSpan = document.getElementById('flag-count');
-	face = document.getElementById('face');
+	// face = document.getElementById('face');
 	newGameButton = document.getElementById('new-game');
 	bestTime = document.getElementById('best-time');
 	levelSelect = document.body.getElementsByTagName('input');
@@ -37,13 +37,13 @@ function startGame(point) {
 function gameOver() {
 	stopTimer();
 	unregisterEventHandlerEach(tds, "click", handleCellClick);
-	face.innerHTML = '<img src="img/fail-face.png" alt="fail-face" />';
+	// face.innerHTML = '<img src="img/fail-face.png" alt="fail-face" />';
 }
 
 function gameFinished() {
 	stopTimer();
 	unregisterEventHandlerEach(tds, "click", handleCellClick);
-	face.innerHTML = '<img src="img/cool-face.png" alt="cool-face" />';
+	// face.innerHTML = '<img src="img/cool-face.png" alt="cool-face" />';
 
 	// Save time to local storage; display best time
 	if (storage.check(mode)) {
