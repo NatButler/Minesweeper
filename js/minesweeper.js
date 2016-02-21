@@ -1,6 +1,6 @@
 (function() {
 
-var minesweeper, started, mineArr, flags, table, flagSpan, face, newGameButton, levelSelect, tds,
+var grid, started, mineArr, flags, table, flagSpan, face, newGameButton, levelSelect, tds,
 	mode = "Intermediate";
 
 window.onload = function() {
@@ -18,7 +18,7 @@ window.onload = function() {
 
 function init() {
 	started = false;
-	Minesweeper(modes.lookup(mode));
+	new Minesweeper(modes.lookup(mode));
 
 	flags = modes.lookup(mode)['mines'];
 	flagSpan.innerHTML = flags;
@@ -26,47 +26,6 @@ function init() {
 	if (storage.check(mode)) {
 		bestTime.innerHTML = "Best: " + storage.get(mode);
 	}
-}
-
-function startGame(point) {
-	started = true;
-	setMines(point);
-	timer();
-}
-
-function gameOver() {
-	stopTimer();
-	unregisterEventHandlers(tds, "click", handleCellClick);
-	face.innerHTML = '<img src="img/fail-face.png" alt="fail-face" />';
-}
-
-function gameFinished() {
-	stopTimer();
-	unregisterEventHandlers(tds, "click", handleCellClick);
-	face.innerHTML = '<img src="img/cool-face.png" alt="cool-face" />';
-
-	// Save time to local storage; display best time
-	if (storage.check(mode)) {
-		if (storage.get(mode) < time.textContent) {
-			storage.set(mode, time.textContent);
-		}
-	} else {
-		storage.set(mode, time.textContent);
-	}
-}
-
-function reset() {
-	stopTimer();
-	resetTimer();
-	face.innerHTML = '';
-
-	forEach(levelSelect, function(select) {
-		if (select.checked) {
-			mode = select.getAttribute('data-mode');
-		}
-	});
-
-	init();
 }
 
 function forEach(array, action) {
@@ -85,6 +44,10 @@ function forEachIn(object, action) {
 
 function compareObj(a, b) {
 	return (JSON.stringify(a) == JSON.stringify(b));
+}
+
+function randomInt(min, max) {
+	return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 function registerEventHandlers(nodes, event, handler) {
@@ -192,9 +155,50 @@ var modes = new Dictionary(
 	}
 );
 
-function Minesweeper(mode) { // Extract table html into separate function
-	var grid = new Grid(mode.width, mode.height, mode.mines),
-		tableHtml = [];
+function startGame(point) {
+	started = true;
+	setMines(point);
+	timer();
+}
+
+function gameOver() {
+	stopTimer();
+	unregisterEventHandlers(tds, "click", handleCellClick);
+	face.innerHTML = '<img src="img/fail-face.png" alt="fail-face" />';
+}
+
+function gameFinished() {
+	stopTimer();
+	unregisterEventHandlers(tds, "click", handleCellClick);
+	face.innerHTML = '<img src="img/cool-face.png" alt="cool-face" />';
+
+	// Save time to local storage; display best time
+	if (storage.check(mode)) {
+		if (storage.get(mode) < time.textContent) {
+			storage.set(mode, time.textContent);
+		}
+	} else {
+		storage.set(mode, time.textContent);
+	}
+}
+
+function reset() {
+	stopTimer();
+	resetTimer();
+	face.innerHTML = '';
+
+	forEach(levelSelect, function(select) {
+		if (select.checked) {
+			mode = select.getAttribute('data-mode');
+		}
+	});
+
+	init();
+}
+
+function Minesweeper(mode) {
+	var tableHtml = [];
+	grid = new Grid(mode.width, mode.height, mode.mines);
 
 	for (var y = 0; y < mode.height; y++) {
 		var x = 0;
@@ -211,7 +215,7 @@ function Minesweeper(mode) { // Extract table html into separate function
 		tableHtml.push('</tr>');
 	}
 
-	this.grid = grid;
+	// this.grid = grid;
 
 	table.innerHTML = tableHtml.join("");
 	tds = document.body.getElementsByTagName('td');
@@ -236,10 +240,7 @@ function createRandomPoints(mode, point) {
 	avoidArr.push(point);
 
 	for (var i = 0; i < mode.mines; i++) {
-		var randX = Math.floor(Math.random() * (mode.width)),
-			randY = Math.floor(Math.random() * (mode.height));  
-
-		randPoints[i] = new Point(randX, randY);
+		randPoints[i] = new Point( randomInt(0, mode.width - 1), randomInt(0, mode.height - 1) );
 
 		for (var k = 0; k <= i-1; k++) {
 			if ( compareObj(randPoints[k], randPoints[i]) ) {
@@ -321,6 +322,37 @@ function checkForMines(cellArr) {
 	return mines;
 }
 
+function checkForUnflaggedMines() {
+	var remainingMines = 0;
+	for (var i = 0; i < mineArr.length; i++) {
+		if (grid.valueAt(mineArr[i]).Status !== "flagged") {
+			remainingMines++;
+			break;
+		}
+	}
+	return remainingMines;
+}
+
+function revealMines(clickedCell) {
+	var arr = mineArr;
+
+	forEach(mineArr, function(mine) {
+		if (grid.valueAt(mine).Status !== "flagged") {
+			grid.setStatusAt(mine, "revealed");
+		}
+	});
+
+	grid.each(function(point, value) {
+		if (value.Value !== 'mine' && value.Status === 'flagged') {
+			grid.setStatusAt(point, 'mis-flagged');
+			arr.push(point);
+		}
+	});
+
+	grid.setStatusAt(clickedCell, "exploaded");
+	return arr;
+}
+
 function updateView(arr) {
 	forEach(arr, function(point) {
 		var cell = grid.valueAt(point);
@@ -336,72 +368,44 @@ function updateView(arr) {
 
 function handleCellClick() {
 	var coords = this.id.split('_'),
-		point = new Point(+coords[0], +coords[1]),
-		cellValue = grid.valueAt(point),
-		viewArr = [point];
+		clickedCell = new Point(+coords[0], +coords[1]),
+		cellValue = grid.valueAt(clickedCell),
+		viewArr = [clickedCell];
 
 	if (event.altKey) { 							// Handle flags
 		if (!cellValue.Status && flags > 0) {
-			grid.setStatusAt(point, "flagged");
+			grid.setStatusAt(clickedCell, "flagged");
 			flags--;
 
-			if (!flags) {
-				var remainingMines = 0;
-				for (var i = 0; i < mineArr.length; i++) {
-					if (grid.valueAt(mineArr[i]).Status !== "flagged") {
-						remainingMines++;
-						break;
-					}
-				}
-
-				if (!remainingMines) {
-					gameFinished();
-				}
+			if (!flags) { 
+				if (!checkForUnflaggedMines) { gameFinished(); }
 			}
 
 		} else if (cellValue.Status === "flagged") {
-			grid.setStatusAt(point);
+			grid.setStatusAt(clickedCell);
 			flags++;
 		}
 
 		flagSpan.innerHTML = flags;
 
-	} else { 					// Handle normal click
-		if (!started) {
-			startGame(point);
-		}									
+	} else { 										// Handle normal click
+		if (!started) { startGame(clickedCell); }									
 		
 		if (!cellValue.Status) {
-			if (cellValue.Value === "mine") { // Mine detonated - reveal all mines and incorrect flags: game over
-				viewArr = mineArr;
-
-				forEach(mineArr, function(mine) {
-					if (grid.valueAt(mine).Status !== "flagged") {
-						grid.setStatusAt(mine, "revealed");
-					}
-				});
-
-				grid.each(function(point, value) {
-					if (value.Value !== 'mine' && value.Status === 'flagged') {
-						grid.setStatusAt(point, 'mis-flagged');
-						viewArr.push(point);
-					}
-				});
-
-				grid.setStatusAt(point, "exploaded");
-
+			if (cellValue.Value === "mine") { 		// Mine detonated - reveal all mines and incorrect flags: game over
+				viewArr = revealMines(clickedCell);
 				gameOver();
 
 			} else if (cellValue.Value === "blank") { // Blank cell - if no mines bordering, reveal all surrounding space
-				var hasMinesBordering = checkForMines(getSurroundingCells(point));
+				var hasMinesBordering = checkForMines(getSurroundingCells(clickedCell));
 
 				if (!hasMinesBordering) {
-					grid.setStatusAt(point, "open");
+					grid.setStatusAt(clickedCell, "open");
 					checkSurroundingCells(viewArr);
 					return;
 
 				} else {
-					grid.setValueAt(point, new Cell( "bordering", "open_"+hasMinesBordering) );
+					grid.setValueAt(clickedCell, new Cell( "bordering", "open_"+hasMinesBordering) );
 				}
 			}
 		}
