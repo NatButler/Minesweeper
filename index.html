@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Minesweeper</title>
+
+	<link rel="stylesheet" type="text/css" href="css/minesweeper.css">
+</head>
+<body>
+
+<p id="flags">Flags: <span id="flag-count"></span></p>
+<p id="best-time"></p>
+<p id="timer"><time>00 : 00</time></p>
+
+<table id="table-grid"></table>
+
+<div id="face"></div>
+
+<button type="button" id="new-game">New game</button>
+
+<form>
+	<ul>
+		<li><input type="radio" name="mode" data-mode="Easy" />Easy</li>
+		<li><input type="radio" name="mode" data-mode="Intermediate" checked="checked" />Intermediate</li>
+		<li><input type="radio" name="mode" data-mode="Hard" />Hard</li>
+	</ul>
+</form>
+
+<p id="instructions">Alt-click to flag mines</p>
+
+
+<script src="js/minesweeper.js"></script>
+<script src="js/timer.js"></script>
+
+</body>
+</html>
