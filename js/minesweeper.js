@@ -355,7 +355,7 @@ function revealMines(clickedCell) {
 
 function updateView(arr) {
 	forEach(arr, function(point) {
-		var cell = grid.valueAt(point);
+		var cell = grid.valueAt(point),
 			elem = tds[point.y * grid.width + point.x];
 
 		elem.className = (cell.Status) ? cell.Status : "blank";
