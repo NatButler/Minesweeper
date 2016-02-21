@@ -12,7 +12,6 @@ window.onload = function() {
 	levelSelect = document.body.getElementsByTagName('input');
 
 	newGameButton.addEventListener('click', reset);
-
 	init();
 };
 
@@ -23,11 +22,8 @@ function init() {
 	flags = modes.lookup(mode)['mines'];
 	flagSpan.innerHTML = flags;
 
-	if (storage.check(mode)) {
-		bestTime.innerHTML = "Best: " + storage.get(mode);
-	} else {
-		bestTime.innerHTML = "";
-	}
+	if (storage.check(mode)) { bestTime.innerHTML = "Best: " + storage.get(mode); } 
+	else { bestTime.innerHTML = ""; }
 }
 
 function forEach(array, action) {
@@ -217,8 +213,6 @@ function Minesweeper(mode) {
 		tableHtml.push('</tr>');
 	}
 
-	// this.grid = grid;
-
 	table.innerHTML = tableHtml.join("");
 	tds = document.body.getElementsByTagName('td');
 	registerEventHandlers(tds, "click", handleCellClick);
@@ -276,13 +270,11 @@ function checkSurroundingCells(cellArr, viewArr) {
 				hasMines = checkForMines(getSurroundingCells(cell));
 
 			if (!hasMines) {
-				if (grid.valueAt(cell).Status === undefined) {
-					blankCells.push(cell);
-				}
+				if (grid.valueAt(cell).Status === undefined) { blankCells.push(cell); }
 
 				grid.setStatusAt(cell, "open");
-
-			} else {
+			} 
+			else {
 				if (grid.valueAt(cell).Status === undefined) {
 					grid.setValueAt( cell, new Cell("bordering", "open_"+hasMines) );
 					viewArr.push(cell);
@@ -291,12 +283,8 @@ function checkSurroundingCells(cellArr, viewArr) {
 		}
 	}
 
-	if (blankCells.length > 0) {
-		checkSurroundingCells(blankCells, viewArr);
-	} else {
-		updateView(viewArr);
-		// return viewArr; // Should return viewArr to click handler function, but isn't hence updateView call
-	}
+	if (blankCells.length > 0) { checkSurroundingCells(blankCells, viewArr); } 
+	else { updateView(viewArr); } // Should return viewArr to click handler, but doesn't hence updateView call
 }
 
 function getSurroundingCells(point) {
@@ -305,9 +293,7 @@ function getSurroundingCells(point) {
 	directions.each(function(name, direction) {
 		var outerCell = point.add(direction);
 
-		if (grid.isInside(outerCell)) {
-			cellArr.push(outerCell);
-		}
+		if (grid.isInside(outerCell)) { cellArr.push(outerCell); }
 	});
 	return cellArr;
 }
@@ -316,9 +302,7 @@ function checkForMines(cellArr) {
 	var mines = 0;
 
 	forEach(cellArr, function(cell) {
-		if (grid.valueAt(cell).Value === "mine") {
-			mines++;
-		}
+		if (grid.valueAt(cell).Value === "mine") { mines++; }
 	});
 
 	return mines;
@@ -339,9 +323,7 @@ function revealMines(clickedCell) {
 	var arr = mineArr;
 
 	forEach(mineArr, function(mine) {
-		if (grid.valueAt(mine).Status !== "flagged") {
-			grid.setStatusAt(mine, "revealed");
-		}
+		if (grid.valueAt(mine).Status !== "flagged") { grid.setStatusAt(mine, "revealed"); }
 	});
 
 	grid.each(function(point, value) {
@@ -362,9 +344,7 @@ function updateView(arr) {
 
 		elem.className = (cell.Status) ? cell.Status : "blank";
 
-		if (cell.Value === "bordering") {
-			elem.innerHTML = cell.Status.split('_')[1];
-		}
+		if (cell.Value === "bordering") { elem.innerHTML = cell.Status.split('_')[1]; }
 	});
 }
 
@@ -407,7 +387,7 @@ function handleCellClick() {
 					return;
 				} 
 				else {
-					grid.setValueAt(clickedCell, new Cell( "bordering", "open_"+hasMinesBordering) );
+					grid.setValueAt( clickedCell, new Cell( "bordering", "open_"+hasMinesBordering) );
 				}
 			}
 		}
@@ -420,25 +400,18 @@ var storage = {
 		if ( this.get(mode) ) { return true; }
 	},
 	set: function(key, val) {
-		if (!key || !val) {return;}
-
+		if (!key || !val) { return; }
 		localStorage.setItem(key, val);
 		return val;
 	},
 	get: function(key) {
 		var val = localStorage.getItem(key);
-
-	    if (!val) {return null;}
-
+	    if (!val) { return null; }
 	    return val;
 	},
 	remove: function(key) {
-		var key;
-
-		var val = localStorage.removeItem(key);
-
-		if (!val) {return 'No item to remove.';}
-
+		var key, val = localStorage.removeItem(key);
+		if (!val) { return null; }
 		return val;
 	},
 	clear: function() {
