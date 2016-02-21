@@ -23,7 +23,6 @@ function init() {
 	flagSpan.innerHTML = flags;
 
 	if (storage.check(mode)) { bestTime.innerHTML = "Best: " + storage.get(mode); } 
-	else { bestTime.innerHTML = ""; }
 }
 
 function forEach(array, action) {
@@ -183,6 +182,7 @@ function reset() {
 	stopTimer();
 	resetTimer();
 	face.innerHTML = '';
+	bestTime.innerHTML = "";
 
 	forEach(levelSelect, function(select) {
 		if (select.checked) {
