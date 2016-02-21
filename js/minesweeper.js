@@ -18,13 +18,15 @@ window.onload = function() {
 
 function init() {
 	started = false;
-	new Minesweeper(modes.lookup(mode));
+	var minesweeper = new Minesweeper(modes.lookup(mode));
 
 	flags = modes.lookup(mode)['mines'];
 	flagSpan.innerHTML = flags;
 
 	if (storage.check(mode)) {
 		bestTime.innerHTML = "Best: " + storage.get(mode);
+	} else {
+		bestTime.innerHTML = "";
 	}
 }
 
@@ -373,12 +375,12 @@ function handleCellClick() {
 		viewArr = [clickedCell];
 
 	if (event.altKey) { 							// Handle flags
-		if (!cellValue.Status && flags > 0) {
+		if (!cellValue.Status && flags) {
 			grid.setStatusAt(clickedCell, "flagged");
 			flags--;
 
 			if (!flags) { 
-				if (!checkForUnflaggedMines) { gameFinished(); }
+				if (!checkForUnflaggedMines()) { gameFinished(); }
 			}
 
 		} else if (cellValue.Status === "flagged") {
@@ -395,16 +397,16 @@ function handleCellClick() {
 			if (cellValue.Value === "mine") { 		// Mine detonated - reveal all mines and incorrect flags: game over
 				viewArr = revealMines(clickedCell);
 				gameOver();
-
-			} else if (cellValue.Value === "blank") { // Blank cell - if no mines bordering, reveal all surrounding space
+			} 
+			else if (cellValue.Value === "blank") { // Blank cell - if no mines bordering, reveal all surrounding space
 				var hasMinesBordering = checkForMines(getSurroundingCells(clickedCell));
 
 				if (!hasMinesBordering) {
 					grid.setStatusAt(clickedCell, "open");
 					checkSurroundingCells(viewArr);
 					return;
-
-				} else {
+				} 
+				else {
 					grid.setValueAt(clickedCell, new Cell( "bordering", "open_"+hasMinesBordering) );
 				}
 			}
@@ -414,32 +416,19 @@ function handleCellClick() {
 }
 
 var storage = {
-	check: function() {
-		if ( this.get() ) {
-			return true;
-		} else {
-			return null;
-		}
+	check: function(mode) {
+		if ( this.get(mode) ) { return true; }
 	},
 	set: function(key, val) {
 		if (!key || !val) {return;}
 
-	    if (typeof val === "object") {
-	    	val = JSON.stringify(val);
-	    }
-
 		localStorage.setItem(key, val);
-		return 'Saved '+ val;
+		return val;
 	},
 	get: function(key) {
 		var val = localStorage.getItem(key);
 
 	    if (!val) {return null;}
-
-	    // assume it is an object that has been stringified
-	    if (val[0] === "{") {
-	    	val = JSON.parse(val);
-	    }
 
 	    return val;
 	},
