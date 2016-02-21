@@ -175,9 +175,8 @@ function gameFinished() {
 		if (storage.get(mode) < time.textContent) {
 			storage.set(mode, time.textContent);
 		}
-	} else {
-		storage.set(mode, time.textContent);
-	}
+	} 
+	else { storage.set(mode, time.textContent); }
 }
 
 function reset() {
