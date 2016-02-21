@@ -124,5 +124,9 @@ span#new-game:hover {
 }
 
 #instructions {
-	font-size: 12px;
+	font-size: 14px;
+}
+
+.new-best-time {
+	color: green;
 }

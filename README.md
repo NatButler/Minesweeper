@@ -1,3 +1,3 @@
 Minesweeper
 
-Javascript recreadtion of the classic game
+Javascript recreation of the classic game
