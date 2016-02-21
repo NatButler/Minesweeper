@@ -18,10 +18,8 @@ window.onload = function() {
 function init() {
 	started = false;
 	minesweeper = new Minesweeper(modes.lookup(mode));
-
 	flags = modes.lookup(mode)['mines'];
 	flagSpan.innerHTML = flags;
-
 	if (storage.check(mode)) { bestTime.innerHTML = "Best: " + storage.get(mode); } 
 }
 
@@ -169,10 +167,10 @@ function gameFinished() {
 	unregisterEventHandlers(tds, "click", handleCellClick);
 	face.innerHTML = '<img src="img/cool-face.png" alt="cool-face" />';
 
-	// Save time to local storage; display best time
-	if (storage.check(mode)) {
-		if (storage.get(mode) < time.textContent) {
+	if (storage.check(mode)) { // Save time to local storage; display best time
+		if (storage.get(mode) > time.textContent) {
 			storage.set(mode, time.textContent);
+			time.className += " new-best-time";
 		}
 	} 
 	else { storage.set(mode, time.textContent); }
@@ -181,6 +179,7 @@ function gameFinished() {
 function reset() {
 	stopTimer();
 	resetTimer();
+	time.className = '';
 	face.innerHTML = '';
 	bestTime.innerHTML = '';
 
@@ -206,7 +205,6 @@ function Minesweeper(mode) {
 			grid.setValueAt( new Point(x, y), val );
 			tableHtml.push('<td id="'+cellId+'" class="blank"></td>');
 		}
-
 		tableHtml.push('</tr>');
 	}
 
@@ -328,8 +326,8 @@ function revealMines(clickedCell) {
 	return viewArr;
 }
 
-function updateView(arr) {
-	forEach(arr, function(point) {
+function updateView(viewArr) {
+	forEach(viewArr, function(point) {
 		var cell = grid.valueAt(point),
 			elem = tds[point.y * grid.width + point.x];
 
