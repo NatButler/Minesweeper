@@ -36,13 +36,13 @@ function startGame(point) {
 
 function gameOver() {
 	stopTimer();
-	unregisterEventHandlerEach(tds, "click", handleCellClick);
+	unregisterEventHandlers(tds, "click", handleCellClick);
 	// face.innerHTML = '<img src="img/fail-face.png" alt="fail-face" />';
 }
 
 function gameFinished() {
 	stopTimer();
-	unregisterEventHandlerEach(tds, "click", handleCellClick);
+	unregisterEventHandlers(tds, "click", handleCellClick);
 	// face.innerHTML = '<img src="img/cool-face.png" alt="cool-face" />';
 
 	// Save time to local storage; display best time
@@ -87,13 +87,13 @@ function compareObj(a, b) {
 	return (JSON.stringify(a) == JSON.stringify(b));
 }
 
-function registerEventHandlerEach(nodes, event, handler) {
+function registerEventHandlers(nodes, event, handler) {
 	forEach(nodes, function(node) {
 		node.addEventListener(event, handler);
 	});
 }
 
-function unregisterEventHandlerEach(nodes, event, handler) {
+function unregisterEventHandlers(nodes, event, handler) {
 	forEach(nodes, function(node) {
 		node.removeEventListener(event, handler);
 	});
@@ -192,6 +192,70 @@ var modes = new Dictionary(
 	}
 );
 
+function Minesweeper(mode) { // Extract table html into separate function
+	var grid = new Grid(mode.width, mode.height, mode.mines),
+		tableHtml = [];
+
+	for (var y = 0; y < mode.height; y++) {
+		var x = 0;
+		tableHtml.push('<tr>');
+
+		for (x; x < mode.width; x++) {
+			var cellId = x + "_" + y,
+				val = new Cell("blank");
+
+			grid.setValueAt( new Point(x, y), val );
+			tableHtml.push('<td id="'+cellId+'" class="blank"></td>')
+		}
+
+		tableHtml.push('</tr>');
+	}
+
+	this.grid = grid;
+
+	table.innerHTML = tableHtml.join("");
+	tds = document.body.getElementsByTagName('td');
+	registerEventHandlers(tds, "click", handleCellClick);
+}
+
+function setMines(point) {
+	var mines = createRandomPoints(modes.lookup(mode), point),
+		len = mines.length;
+
+	forEach(mines, function(mine) {
+		grid.setValueAt( mine, new Cell("mine") );
+	});
+
+	mineArr = mines;
+}
+
+function createRandomPoints(mode, point) {
+	var avoidArr = getSurroundingCells(point),
+		randPoints = [];
+
+	avoidArr.push(point);
+
+	for (var i = 0; i < mode.mines; i++) {
+		var randX = Math.floor(Math.random() * (mode.width)),
+			randY = Math.floor(Math.random() * (mode.height));  
+
+		randPoints[i] = new Point(randX, randY);
+
+		for (var k = 0; k <= i-1; k++) {
+			if ( compareObj(randPoints[k], randPoints[i]) ) {
+				i--;  // duplicate found so decrement i
+			}
+		}
+
+		for (var j = 0, len = avoidArr.length; j < len; j++) {
+			if ( compareObj(avoidArr[j], randPoints[i]) ) {
+				i--;
+			}
+		}
+	}
+	return randPoints;
+}
+
 function checkSurroundingCells(cellArr, viewArr) {
 	var arrLen = cellArr.length,
 		blankCells = [],
@@ -255,70 +319,6 @@ function checkForMines(cellArr) {
 	});
 
 	return mines;
-}
-
-function Minesweeper(mode) { // Extract table html into separate function
-	var grid = new Grid(mode.width, mode.height, mode.mines),
-		tableHtml = [];
-
-	for (var y = 0; y < mode.height; y++) {
-		var x = 0;
-		tableHtml.push('<tr>');
-
-		for (x; x < mode.width; x++) {
-			var cellId = x + "_" + y,
-				val = new Cell("blank");
-
-			grid.setValueAt( new Point(x, y), val );
-			tableHtml.push('<td id="'+cellId+'" class="blank"></td>')
-		}
-
-		tableHtml.push('</tr>');
-	}
-
-	this.grid = grid;
-
-	table.innerHTML = tableHtml.join("");
-	tds = document.body.getElementsByTagName('td');
-	registerEventHandlerEach(tds, "click", handleCellClick);
-}
-
-function setMines(point) {
-	var mines = createRandomPoints(modes.lookup(mode), point),
-		len = mines.length;
-
-	forEach(mines, function(mine) {
-		grid.setValueAt( mine, new Cell("mine") );
-	});
-
-	mineArr = mines;
-}
-
-function createRandomPoints(mode, point) {
-	var avoidArr = getSurroundingCells(point),
-		randPoints = [];
-
-	avoidArr.push(point);
-
-	for (var i = 0; i < mode.mines; i++) {
-		var randX = Math.floor(Math.random() * (mode.width)),
-			randY = Math.floor(Math.random() * (mode.height));  
-
-		randPoints[i] = new Point(randX, randY);
-
-		for (var k = 0; k <= i-1; k++) {
-			if ( compareObj(randPoints[k], randPoints[i]) ) {
-				i--;  // duplicate found so decrement i
-			}
-		}
-
-		for (var j = 0, len = avoidArr.length; j < len; j++) {
-			if ( compareObj(avoidArr[j], randPoints[i]) ) {
-				i--;
-			}
-		}
-	}
-	return randPoints;
 }
 
 function updateView(arr) {
