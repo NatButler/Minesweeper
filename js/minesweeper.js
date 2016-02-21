@@ -182,7 +182,7 @@ function reset() {
 	stopTimer();
 	resetTimer();
 	face.innerHTML = '';
-	bestTime.innerHTML = "";
+	bestTime.innerHTML = '';
 
 	forEach(levelSelect, function(select) {
 		if (select.checked) { mode = select.getAttribute('data-mode'); }
@@ -265,7 +265,6 @@ function checkSurroundingCells(cellArr, viewArr) {
 
 			if (!hasMines) {
 				if (grid.valueAt(cell).Status === undefined) { blankCells.push(cell); }
-
 				grid.setStatusAt(cell, "open");
 			} 
 			else {
@@ -286,7 +285,6 @@ function getSurroundingCells(point) {
 
 	directions.each(function(name, direction) {
 		var outerCell = point.add(direction);
-
 		if (grid.isInside(outerCell)) { cellArr.push(outerCell); }
 	});
 	return cellArr;
@@ -298,7 +296,6 @@ function checkForMines(cellArr) {
 	forEach(cellArr, function(cell) {
 		if (grid.valueAt(cell).Value === "mine") { mines++; }
 	});
-
 	return mines;
 }
 
