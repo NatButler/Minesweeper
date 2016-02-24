@@ -239,7 +239,8 @@ function createRandomPoints(mode, point) {
 		for (var j = 0, len = avoidArr.length; j < len; j++) {
 			if ( compareObj(avoidArr[j], randPoints[i]) ) {
 				i--;
-			}
+			} 
+			// else { avoidArr.push(randPoints[i]); }
 		}
 	}
 	return randPoints;
