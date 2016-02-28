@@ -13,7 +13,7 @@ window.onload = function() {
 
 	newGameButton.addEventListener('click', reset);
 	init();
-};
+}
 
 function init() {
 	started = false;
@@ -74,17 +74,17 @@ function Grid(width, height, flags) {
 }
 Grid.prototype.valueAt = function(point) {
 	return this.cells[point.y * this.width + point.x];
-};
+}
 Grid.prototype.setValueAt = function(point, value) {
 	this.cells[point.y * this.width + point.x] = value;
-};
+}
 Grid.prototype.setStatusAt = function(point, status) {
 	this.cells[point.y * this.width + point.x]["Status"] = status;
 }
 Grid.prototype.isInside = function(point) {
 	return point.x >= 0 && point.y >= 0 &&
 		   point.x < this.width && point.y < this.height;
-};
+}
 Grid.prototype.each = function(action) {
 	for (var y = 0; y < this.height; y++) {
 		for (var x = 0; x < this.width; x++) {
@@ -92,7 +92,7 @@ Grid.prototype.each = function(action) {
 			action(point, this.valueAt(point));
 		}
 	}
-};
+}
 
 
 function Cell(value, status) {
@@ -106,16 +106,16 @@ function Dictionary(startValues) {
 }
 Dictionary.prototype.store = function(name, value) {
 	this.values[name] = value;
-};
+}
 Dictionary.prototype.lookup = function(name) {
 	return this.values[name];
-};
+}
 Dictionary.prototype.contains = function(name) {
 	return Object.prototype.propertyIsEnumerable.call(this.values, name);
-};
+}
 Dictionary.prototype.each = function(action) {
 	forEachIn(this.values, action);
-};
+}
 
 var directions = new Dictionary(
 	{
@@ -194,7 +194,7 @@ function Minesweeper(mode) {
 	var tableHtml = [];
 	grid = new Grid(mode.width, mode.height, mode.mines);
 
-	for (var y = 0; y < mode.height; y++) {
+	for (var y = 0; y < mode.height; y++) { // Use grid.each to achieve this?
 		var x = 0;
 		tableHtml.push('<tr>');
 
