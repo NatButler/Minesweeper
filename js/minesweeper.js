@@ -110,7 +110,7 @@ function Cell(value, status) {
 
 
 // GRID CONSTRUCTOR
-function Grid(width, height, flags) {
+function Grid(width, height) {
 	this.width = width;
 	this.height = height;
 	this.cells = new Array(width * height);
@@ -143,7 +143,7 @@ function Minesweeper(mode) {
 	this.mode = modes.lookup(mode);
 	this.flags = this.mode.mines;	
 
-	grid = new Grid(this.mode.width, this.mode.height, this.mode.mines);
+	grid = new Grid(this.mode.width, this.mode.height);
 
 	table.innerHTML = this.buildTable();
 }
