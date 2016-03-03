@@ -1,6 +1,6 @@
 (function() {
 
-var minesweeper, grid, started, mineArr, table, flagSpan, face, newGameButton, levelSelect, tds,
+var grid, started, table, flagSpan, face, newGameButton, levelSelect, tds,
 	mode = "Intermediate";
 
 var modes = new Dictionary({
@@ -109,7 +109,8 @@ Grid.prototype.each = function(action) {
 // MINESWEEPER CONSTRUCTOR
 function Minesweeper(mode) {
 	this.mode = modes.lookup(mode);
-	this.flags = this.mode.mines;	
+	this.flags = this.mode.mines;
+	this.mineArr;
 
 	grid = new Grid(this.mode.width, this.mode.height);
 	table.innerHTML = this.buildTable();
@@ -129,9 +130,9 @@ Minesweeper.prototype.buildTable = function() {
 	return tableHtml.join('');
 }
 Minesweeper.prototype.setMines = function(point) {
-	mineArr = this.createRandomPoints(point);
+	this.mineArr = this.createRandomPoints(point);
 
-	forEach(mineArr, function(mine) {
+	forEach(this.mineArr, function(mine) {
 		grid.setValueAt( mine, new Cell("mine") );
 	});
 }
@@ -225,7 +226,7 @@ function handleCellClick() {
 			minesweeper.flags--;
 
 			if (!minesweeper.flags) { 
-				if (!checkForUnflaggedMines()) { gameComplete(); }
+				if (!checkForUnflaggedMines(minesweeper.mineArr)) { gameComplete(); }
 			}
 		} 
 		else if (cell.Status === "flagged") {
@@ -319,7 +320,7 @@ function checkForMines(cellArr) {
 	return mines;
 }
 
-function checkForUnflaggedMines() {
+function checkForUnflaggedMines(mineArr) {
 	var remainingMines = 0;
 	for (var i = 0; i < mineArr.length; i++) {
 		if (grid.valueAt(mineArr[i]).Status !== "flagged") {
@@ -331,7 +332,7 @@ function checkForUnflaggedMines() {
 }
 
 function revealMines(point) {
-	var viewArr = mineArr;
+	var viewArr = minesweeper.mineArr;
 	grid.each(function(point, cell) {
 		if (cell.Value !== 'mine' && cell.Status === 'flagged') {
 			grid.setStatusAt(point, 'mis-flagged');
