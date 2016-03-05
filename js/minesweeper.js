@@ -4,33 +4,33 @@ var grid, started, table, flagSpan, face, newGameButton, levelSelect, tds,
 	mode = "Intermediate";
 
 var modes = new Dictionary({
-		"Easy": {
-			"width": 9,
-			"height": 9,
-			"mines": 10
-		},
-		"Intermediate": {
-			"width": 16,
-			"height": 16,
-			"mines": 40
-		},
-		"Hard": {
-			"width": 30,
-			"height": 16,
-			"mines": 99
-		}
-	});
+	"Easy": {
+		"width": 9,
+		"height": 9,
+		"mines": 10
+	},
+	"Intermediate": {
+		"width": 16,
+		"height": 16,
+		"mines": 40
+	},
+	"Hard": {
+		"width": 30,
+		"height": 16,
+		"mines": 99
+	}
+});
 
 var directions = new Dictionary({
-		"n":  new Point(0, -1),
-	 	"ne": new Point(1, -1),
-	 	"e":  new Point(1, 0),
-		"se": new Point(1, 1),
-		"s":  new Point(0, 1),
-		"sw": new Point(-1, 1),
-		"w":  new Point(-1, 0),
-		"nw": new Point(-1, -1)
-	});
+	"n":  new Point(0, -1),
+ 	"ne": new Point(1, -1),
+ 	"e":  new Point(1, 0),
+	"se": new Point(1, 1),
+	"s":  new Point(0, 1),
+	"sw": new Point(-1, 1),
+	"w":  new Point(-1, 0),
+	"nw": new Point(-1, -1)
+});
 
 window.onload = function() {
 	cache();
@@ -43,13 +43,12 @@ function cache() {
 	face = document.getElementById('face');
 	newGameButton = document.getElementById('new-game');
 	bestTime = document.getElementById('best-time');
-	levelSelect = document.body.getElementsByTagName('input');
+	levelSelect = document.getElementsByTagName('input');
 }
 
 function init() {
 	started = false;
 	minesweeper = new Minesweeper(mode);
-
 	tds = document.body.getElementsByTagName('td');
 
 	registerEventHandlers(tds, "click", handleCellClick);
@@ -122,7 +121,7 @@ Minesweeper.prototype.buildTable = function() {
 		tableHtml.push('<tr>');
 
 		for (x; x < this.mode.width; x++) {
-			grid.setValueAt( new Point(x, y), new Cell("blank") ); // Perhaps remove to different function
+			grid.setValueAt( new Point(x, y), new Cell("blank") ); // Perhaps remove to setMines()?
 			tableHtml.push('<td id="'+x+'_'+y+'" class="blank"></td>');
 		}
 		tableHtml.push('</tr>');
@@ -166,7 +165,7 @@ Dictionary.prototype.store = function(name, value) {
 Dictionary.prototype.lookup = function(name) {
 	return this.values[name];
 }
-Dictionary.prototype.contains = function(name) {
+Dictionary.prototype.contains = function(name) { // Not used
 	return Object.prototype.propertyIsEnumerable.call(this.values, name);
 }
 Dictionary.prototype.each = function(action) {
@@ -221,6 +220,7 @@ function handleCellClick() {
 		viewArr = [point];
 
 	if (event.altKey) { 							// Handle flags
+
 		if (!cell.Status && minesweeper.flags) {
 			grid.setStatusAt(point, "flagged");
 			minesweeper.flags--;
@@ -229,6 +229,7 @@ function handleCellClick() {
 				if (!checkForUnflaggedMines(minesweeper.mineArr)) { gameComplete(); }
 			}
 		} 
+		
 		else if (cell.Status === "flagged") {
 			grid.setStatusAt(point);
 			minesweeper.flags++;
@@ -239,10 +240,12 @@ function handleCellClick() {
 	else { 											// Handle click
 		if (!started) { gameStart(point); }									
 		if (!cell.Status) {
+
 			if (cell.Value === "mine") {
 				viewArr = revealMines(point);
 				gameOver();
 			} 
+
 			else if (cell.Value === "blank") {
 				var hasMinesBordering = checkForMines(getSurroundingCells(point));
 
@@ -255,6 +258,7 @@ function handleCellClick() {
 					grid.setValueAt( point, new Cell( "bordering", "open_"+hasMinesBordering) );
 				}
 			}
+
 		}
 	}
 	updateView(viewArr);
