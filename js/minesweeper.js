@@ -212,13 +212,13 @@ function gameReset() {
 	});
 }
 
-function handleCellClick() {
+function handleCellClick(e) {
 	var coords = this.id.split('_'),
 		point = new Point(+coords[0], +coords[1]),
 		cell = game.grid.valueAt(point),
 		view = [point];
 
-	if (event.altKey) { 							// Handle flagged
+	if (e.altKey) { 							// Handle flagged
 		if (!cell.status && game.flags) {
 			game.grid.setStatusAt(point, "flagged");
 			game.setFlag();
