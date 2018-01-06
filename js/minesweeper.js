@@ -135,7 +135,7 @@ Minesweeper.prototype.setMines = function(point) {
 }
 Minesweeper.prototype.generateMines = function(point) {
 	var avoidArr = getSurroundingCells(point),
-		randPoints = [];
+			randPoints = [];
 
 	avoidArr.push(point);
 
@@ -214,9 +214,9 @@ function gameReset() {
 
 function handleCellClick(e) {
 	var coords = this.id.split('_'),
-		point = new Point(+coords[0], +coords[1]),
-		cell = game.grid.valueAt(point),
-		view = [point];
+			point = new Point(+coords[0], +coords[1]),
+			cell = game.grid.valueAt(point),
+			view = [point];
 
 	if (e.altKey) { 							// Handle flagged
 		if (!cell.status && game.flags) {
@@ -235,7 +235,7 @@ function handleCellClick(e) {
 
 		flagSpan.innerHTML = game.flags;
 	} 
-	else { 											// Handle click
+	else { 												// Handle click
 		if (!started) { gameStart(point); }									
 		if (!cell.status) {
 
@@ -245,7 +245,6 @@ function handleCellClick(e) {
 			} 
 
 			else if (cell.value === "blank") {
-
 				if ( !hasMinesBordering(point) ) {
 					game.grid.setStatusAt(point, "open");
 					findSurroundingBlankCells(view);
@@ -262,9 +261,9 @@ function handleCellClick(e) {
 }
 
 function updateView(view) {
-	forEach(view, function(point) {
+	view.forEach(point => {
 		var cell = game.grid.valueAt(point),
-			td = tds[point.y * game.grid.width + point.x];
+				td = tds[point.y * game.grid.width + point.x];
 
 		td.className = (cell.status) ? cell.status : "blank";
 		if (cell.value === "bordering") { td.innerHTML = cell.status.split('_')[1]; }
@@ -277,13 +276,13 @@ function findSurroundingBlankCells(cells, view) {
 
 	for (var j = 0, len = cells.length; j < len; j++) {
 		var currentCell = cells[j],
-			surroundingCells = getSurroundingCells(currentCell);
+				surroundingCells = getSurroundingCells(currentCell);
 
 		view.push(currentCell);
 
 		for (var i = 0, leng = surroundingCells.length; i < leng; i++) {
 			var point = surroundingCells[i],
-				mines = hasMinesBordering(point);
+					mines = hasMinesBordering(point);
 
 			if ( !mines ) {
 				if (!game.grid.valueAt(point).status) { blankCells.push(point); }
@@ -314,11 +313,10 @@ function getSurroundingCells(point) {
 }
 
 function checkForMines(cells) {
-	var mines = 0;
-	forEach(cells, function(point) {
+	return cells.reduce((mines, point) => {
 		if (game.grid.valueAt(point).value === "mine") { mines++; }
-	});
-	return mines;
+		return mines;
+	}, 0);
 }
 
 function checkForUnflaggedMines(mines) {
